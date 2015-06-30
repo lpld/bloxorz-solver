@@ -37,6 +37,15 @@ trait GameDef {
 
     /** The position obtained by changing the `y` coordinate by `d` */
     def dy(d: Int) = copy(y = y + d)
+
+    override def canEqual(p: Any) = p.isInstanceOf[Pos]
+
+    override def equals(p: Any) = p match {
+      case p: Pos => p.canEqual(this) && p.x == x && p.y == y
+      case _ => false
+    }
+
+    override def hashCode = 17 * x + y
   }
 
   /**
@@ -80,11 +89,13 @@ trait GameDef {
   case object Up    extends Move
   case object Down  extends Move
 
+//  val possibleMoves = List(Left, Right, Up, Down)
+
   /**
    * This function returns the block at the start position of
    * the game.
    */
-  def startBlock: Block = ???
+  def startBlock: Block = Block(startPos, startPos)
 
   /**
    * A block is represented by the position of the two cubes that
@@ -134,23 +145,27 @@ trait GameDef {
      * Returns the list of blocks that can be obtained by moving
      * the current block, together with the corresponding move.
      */
-    def neighbors: List[(Block, Move)] = ???
+    def neighbors: List[(Block, Move)] = List(
+      (left, Left), (right, Right), (up, Up), (down, Down)
+    )
 
     /**
      * Returns the list of positions reachable from the current block
      * which are inside the terrain.
      */
-    def legalNeighbors: List[(Block, Move)] = ???
+    def legalNeighbors: List[(Block, Move)] = neighbors filter (_._1.isLegal)
 
     /**
      * Returns `true` if the block is standing.
      */
-    def isStanding: Boolean = ???
+    def isStanding: Boolean = b1 == b2
 
     /**
      * Returns `true` if the block is entirely inside the terrain.
      */
-    def isLegal: Boolean = ???
+    def isLegal: Boolean =
+      if (isStanding) terrain(b1)
+      else terrain(b1) && terrain(b2)
 
   }
 }
