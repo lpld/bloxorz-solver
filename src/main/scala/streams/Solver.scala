@@ -104,5 +104,5 @@ trait Solver extends GameDef {
    */
   lazy val solution: List[Move] =
     if (pathsToGoal.isEmpty) throw new Error("Solution not found")
-    else pathsToGoal.head._2
+    else pathsToGoal.head._2.reverse
 }
